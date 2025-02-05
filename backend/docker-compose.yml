@@ -1,0 +1,12 @@
+services:
+  mongodb:
+    image: mongo
+    command: [ '--port', '27017' ]
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodata:/data/db
+
+volumes:
+  mongodata: {}
+  redisdata: {}
