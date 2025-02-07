@@ -13,7 +13,11 @@ export const appConfig = () => ({
   secrets: {
     refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET || 'i6aXnMuF5OQQwNqC',
     accessTokenSecret: process.env.ACCESS_TOKEN_SECRET || '1LjF6lwVZ7VDhS4S',
-  }
+  },
+  brapi: {
+    baseUrl: process.env.BRAPI_BASE_URL || 'https://brapi.dev/api',
+    token: process.env.BRAPI_TOKEN,
+  },
 });
 
 export type AppConfigType = ReturnType<typeof appConfig>;
