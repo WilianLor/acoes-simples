@@ -22,11 +22,11 @@ export class TransactionService {
   ) { }
 
   async create(
-    { stock: createStock, ...createTransaction }: CreateTransactionDto,
+    { stock: stockName, ...createTransaction }: CreateTransactionDto,
     userId: string,
   ): Promise<Transaction[]> {
     const user = await this.userService.getUserById(userId);
-    const stock = await this.stockService.getOrCreate(createStock);
+    const stock = await this.stockService.getOrCreate(stockName);
 
     const { quantity } = calculateStockPosition(user.transactions, stock.id);
 

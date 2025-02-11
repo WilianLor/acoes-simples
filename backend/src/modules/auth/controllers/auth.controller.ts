@@ -11,8 +11,6 @@ export class AuthController {
 
   @Post('/login')
   async login(@Body() data: LoginDto): Promise<AuthEntity> {
-    console.log(data)
-    console.log("____________________________")
     return this.authService.login(data);
   }
 

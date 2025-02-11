@@ -11,27 +11,36 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { useState, useCallback, useEffect } from "react";
-import { debounce } from "lodash";
+import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import axiosAuth from "@/lib/service/axiosAuth";
+import { useToast } from "@/hooks/use-toast";
+import { debounce } from "lodash";
 
 interface AddInvestmentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  refetch?: () => Promise<void>;
 }
 
-export function AddInvestmentDialog({ open, onOpenChange }: AddInvestmentDialogProps) {
-  const { register, handleSubmit, reset, control, setValue } = useForm();
+export function AddInvestmentDialog({
+  open,
+  onOpenChange,
+  refetch,
+}: AddInvestmentDialogProps) {
+  const { register, handleSubmit, control, setValue } = useForm();
+  const { toast } = useToast();
   const [date, setDate] = useState<Date>(new Date());
-  const [search, setSearch] = useState("");
-  const [stocks, setStocks] = useState<any[]>([]);  // Armazenando os dados de estoque
-  const [isLoading, setIsLoading] = useState(false);  // Controlando o estado de carregamento
-
+  const [stocks, setStocks] = useState<any[]>([]); // Armazenando os dados de estoque
+  const [isLoading, setIsLoading] = useState(false); // Controlando o estado de carregamento
 
   const fetchStocks = useCallback(
     debounce(async (search: string) => {
@@ -40,13 +49,12 @@ export function AddInvestmentDialog({ open, onOpenChange }: AddInvestmentDialogP
       try {
         const response = await axiosAuth.get(`/stock/search`, {
           params: {
-              search: search,
-              limit: 5
-          }
-      });
-      const data = response.data;
+            search: search,
+            limit: 5,
+          },
+        });
+        const data = response.data;
         setStocks(data);
-        console.log(data);
       } catch (error) {
         console.error("Erro ao buscar ações:", error);
       } finally {
@@ -56,48 +64,29 @@ export function AddInvestmentDialog({ open, onOpenChange }: AddInvestmentDialogP
     []
   );
 
-  useEffect(() => {
-    fetchStocks(search);
-  }, [search, fetchStocks]);
-
-  const handleSearch = useCallback(
-    debounce((value: string) => setSearch(value), 500),
-    []
-  );
-
-  // Efetuar a busca toda vez que o valor de 'search' mudar
-  useEffect(() => {
-    if (search) {
-      fetchStocks(search);
-    }
-  }, [search]);
-
   async function onSubmit(data: any) {
     const investmentData = {
-      stock: {
-        stock: data.stock.toUpperCase(),
-        type: data.stockType,
-      },
+      stock: data.stock,
       type: data.transactionType,
       quantity: parseInt(data.quantity),
       price: parseFloat(data.price),
       tax: parseFloat(data.tax) || 0,
-      date: date ? date.toISOString() : new Date().toISOString(),
+      date: date,
     };
 
     try {
-      console.log(investmentData);
-      reset({
-        stock: "",
-        stockType: "stock",
-        transactionType: "buy",
-        quantity: "",
-        price: "",
-        tax: "",
-      });
+      await axiosAuth.post("/transaction", investmentData);
+
+      onOpenChange(false);
+      if (refetch) refetch();
     } catch (error) {
-      console.log("Erro ao adicionar investimento", error);
-      alert("Erro ao adicionar investimento");
+      toast({
+        variant: "destructive",
+        title: "Erro:",
+        description:
+          (error as any)?.response.data.message ||
+          "Erro ao adicionar movimentação",
+      });
     }
   }
 
@@ -109,36 +98,40 @@ export function AddInvestmentDialog({ open, onOpenChange }: AddInvestmentDialogP
             Adicionar Investimento
           </DialogTitle>
         </DialogHeader>
-
-        <form onSubmit={onSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-2 relative">
-            <Label htmlFor="name" className="text-yellow-500">Nome</Label>
-
-            {/* Campo de entrada para a busca */}
+            <Label htmlFor="name" className="text-yellow-500">
+              Nome
+            </Label>
             <Input
               id="stock"
               placeholder="Insira o nome do investimento"
               required
               className="bg-zinc-800 border-zinc-700 text-white"
-              {...register("stock")} // Registra o campo no react-hook-form
+              {...register("stock")}
               onChange={(e) => {
-                setSearch(e.target.value);
-                setValue("stock", e.target.value); // Atualiza o valor no react-hook-form
+                fetchStocks(e.target.value);
+                setValue("stock", e.target.value);
               }}
-              value={search}
             />
 
-            {/* Lista de sugestões */}
-            {stocks?.length > 0 && (
+            {isLoading && (
+              <div className="absolute z-10 mt-1 w-full bg-zinc-900 border border-zinc-700 rounded-md shadow-lg">
+                <div className="p-2 hover:bg-zinc-700 cursor-pointer text-white">
+                  Carregando...
+                </div>
+              </div>
+            )}
+
+            {stocks?.length > 0 && !isLoading && (
               <div className="absolute z-10 mt-1 w-full bg-zinc-900 border border-zinc-700 rounded-md shadow-lg">
                 {stocks.map((stock: any, index: number) => (
                   <div
-                  key={stock.id ?? `stock-${index}`}
+                    key={stock.id ?? `stock-${index}`}
                     className="p-2 hover:bg-zinc-700 cursor-pointer text-white"
                     onClick={() => {
-                      setSearch(stock.stock);
-                      setValue("stock", stock.stock); // Atualiza o valor no react-hook-form
-                      setStocks([]); // Limpa a lista de sugestões
+                      setValue("stock", stock.stock);
+                      setStocks([]);
                     }}
                   >
                     {stock.name} ({stock.stock})
@@ -147,35 +140,7 @@ export function AddInvestmentDialog({ open, onOpenChange }: AddInvestmentDialogP
               </div>
             )}
           </div>
-
           <div className="flex items-center space-x-4">
-            <div className="space-y-2 w-1/2">
-              <Label className="text-yellow-500">Tipo de Investimento</Label>
-              <Controller
-                name="stockType"
-                control={control}
-                defaultValue="stock"
-                render={({ field }) => (
-                  <RadioGroup onValueChange={field.onChange} value={field.value} required className="flex gap-4">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="stock" id="stock" className="border-yellow-500 text-yellow-500" />
-                      <Label htmlFor="stock" className="text-white">Ação</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="fund" id="fund" className="border-yellow-500 text-yellow-500" />
-                      <Label htmlFor="fund" className="text-white">Fundo</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="bdr" id="bdr" className="border-yellow-500 text-yellow-500" />
-                      <Label htmlFor="bdr" className="text-white">BDR</Label>
-                    </div>
-                  </RadioGroup>
-                )}
-              />
-            </div>
-
-            <div className="border-l-2 border-yellow-500 h-10"></div> {/* Divider */}
-
             <div className="space-y-2 w-1/2">
               <Label className="text-yellow-500">Tipo de Transação</Label>
               <Controller
@@ -183,21 +148,37 @@ export function AddInvestmentDialog({ open, onOpenChange }: AddInvestmentDialogP
                 control={control}
                 defaultValue="buy"
                 render={({ field }) => (
-                  <RadioGroup onValueChange={field.onChange} value={field.value} required className="flex gap-4">
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    required
+                    className="flex gap-4"
+                  >
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="buy" id="buy" className="border-yellow-500 text-yellow-500" />
-                      <Label htmlFor="buy" className="text-white">Compra</Label>
+                      <RadioGroupItem
+                        value="buy"
+                        id="buy"
+                        className="border-yellow-500 text-yellow-500"
+                      />
+                      <Label htmlFor="buy" className="text-white">
+                        Compra
+                      </Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="sell" id="sell" className="border-yellow-500 text-yellow-500" />
-                      <Label htmlFor="sell" className="text-white">Venda</Label>
+                      <RadioGroupItem
+                        value="sale"
+                        id="sale"
+                        className="border-yellow-500 text-yellow-500"
+                      />
+                      <Label htmlFor="sale" className="text-white">
+                        Venda
+                      </Label>
                     </div>
                   </RadioGroup>
                 )}
               />
             </div>
           </div>
-
           <div className="space-y-2">
             <Label className="text-yellow-500">Data</Label>
             <Popover>
@@ -217,7 +198,9 @@ export function AddInvestmentDialog({ open, onOpenChange }: AddInvestmentDialogP
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={(selectedDate: Date | undefined) => setDate(selectedDate ?? new Date())}
+                  onSelect={(selectedDate: Date | undefined) =>
+                    setDate(selectedDate ?? new Date())
+                  }
                   required
                   initialFocus
                   className="bg-zinc-800"
@@ -225,9 +208,10 @@ export function AddInvestmentDialog({ open, onOpenChange }: AddInvestmentDialogP
               </PopoverContent>
             </Popover>
           </div>
-
           <div className="space-y-2">
-            <Label htmlFor="quantity" className="text-yellow-500">Quantidade</Label>
+            <Label htmlFor="quantity" className="text-yellow-500">
+              Quantidade
+            </Label>
             <Input
               id="quantity"
               type="number"
@@ -237,9 +221,10 @@ export function AddInvestmentDialog({ open, onOpenChange }: AddInvestmentDialogP
               placeholder="Quantidade"
             />
           </div>
-
           <div className="space-y-2">
-            <Label htmlFor="price" className="text-yellow-500">Valor por cota</Label>
+            <Label htmlFor="price" className="text-yellow-500">
+              Valor por cota
+            </Label>
             <Input
               id="price"
               type="number"
@@ -250,9 +235,10 @@ export function AddInvestmentDialog({ open, onOpenChange }: AddInvestmentDialogP
               placeholder="Insira o valor por cota"
             />
           </div>
-
           <div className="space-y-2">
-            <Label htmlFor="tax" className="text-yellow-500">Taxa de Corretagem</Label>
+            <Label htmlFor="tax" className="text-yellow-500">
+              Taxa de Corretagem
+            </Label>
             <Input
               id="tax"
               type="number"
@@ -263,8 +249,10 @@ export function AddInvestmentDialog({ open, onOpenChange }: AddInvestmentDialogP
               placeholder="Insira a taxa de corretagem"
             />
           </div>
-
-          <Button type="submit" className="w-full bg-yellow-500 hover:bg-yellow-600 text-black">
+          <Button
+            type="submit"
+            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black"
+          >
             Adicionar
           </Button>
         </form>

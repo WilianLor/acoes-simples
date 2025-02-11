@@ -1,10 +1,8 @@
 import { DashboardHeader } from "@/components/analytics/header";
 import { PriceChart } from "@/components/analytics/price-chart";
 import { TransactionsTable } from "@/components/analytics/transactions-table";
-import { StatsCards } from "@/components/analytics/stats-cards";
 import { TimeframeSelector } from "@/components/analytics/timeframe-selector";
 import { AddButton } from "@/components/dashboard/add-investment/add-button";
-
 
 export default function DashboardDetailsPage() {
   return (

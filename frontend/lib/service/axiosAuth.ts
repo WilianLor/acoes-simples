@@ -1,6 +1,5 @@
 import axios from "axios"
 
-// const BASE_URL = 'http://localhost:3333'
 import { getSession } from 'next-auth/react';
 
 const axiosAuth = axios.create({
@@ -10,7 +9,6 @@ const axiosAuth = axios.create({
     },
 });
 
-// Add a request interceptor
 axiosAuth.interceptors.request.use(
     async (config) => {
         const session = await getSession();
@@ -20,7 +18,6 @@ axiosAuth.interceptors.request.use(
         return config;
     },
     (error) => {
-        // Do something with request error
         return Promise.reject(error);
     }
 );

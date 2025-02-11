@@ -27,7 +27,7 @@ export class TransactionController {
     @Body() createTransactionDto: CreateTransactionDto,
     @Request() { userId }: IRequest,
   ): Promise<Transaction[]> {
-    return await this.transactionService.create(createTransactionDto, userId);
+    return this.transactionService.create(createTransactionDto, userId);
   }
 
   @Delete('/:transactionId')
@@ -35,7 +35,7 @@ export class TransactionController {
     @Param('transactionId') transactionId: string,
     @Request() { userId }: IRequest,
   ): Promise<Transaction[]> {
-    return await this.transactionService.delete(transactionId, userId);
+    return this.transactionService.delete(transactionId, userId);
   }
 
   @Get()
@@ -43,9 +43,6 @@ export class TransactionController {
     @Query() filter: ListTransactionFilter,
     @Request() { userId }: IRequest,
   ): Promise<ListTransactionEntity> {
-    console.log(filter)
-    const d = await this.transactionService.list(filter, userId);
-    console.log(d)
-    return d
+    return this.transactionService.list(filter, userId);
   }
 }

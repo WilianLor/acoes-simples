@@ -21,12 +21,19 @@ export class StockService {
     private readonly userService: UserService,
   ) { }
 
-  async getOrCreate(createStock: ICreateStock): Promise<Stock> {
-    const stock = await this.stockModel.findOne({ stock: createStock.stock });
+  async getOrCreate(stockName: string): Promise<Stock> {
+    const stock = await this.stockModel.findOne({ stock: stockName });
 
     if (stock) return stock;
 
-    const newStock = await this.stockModel.create(createStock);
+    const brapiStock = await this.brapiService.quote(stockName, { interval: '1d', range: '1d' });
+
+    const newStock = await this.stockModel.create({
+      stock: brapiStock.results[0].symbol,
+      name: brapiStock.results[0].longName,
+      logo: brapiStock.results[0].logourl,
+      type: 'stock'
+    });
 
     return newStock;
   }

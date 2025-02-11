@@ -40,7 +40,6 @@ export class StockController {
     @Query() filter: StockDetailFilter,
     @Request() { userId }: IRequest,
   ): Promise<StockDetailsEntity> {
-    console.log(stock)
     return await this.stockService.details(filter, stock, userId);
   }
 }

@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { AddInvestmentDialog } from "./add-investment-dialog";
 import { useState } from "react";
 
-export function AddButton() {
+export interface AddButtonProps {
+  refetch?: () => Promise<void>;
+}
+
+export const AddButton = ({ refetch }: AddButtonProps) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -17,7 +21,11 @@ export function AddButton() {
       >
         <Plus className="h-6 w-6" />
       </Button>
-      <AddInvestmentDialog open={open} onOpenChange={setOpen} />
+      <AddInvestmentDialog
+        open={open}
+        onOpenChange={setOpen}
+        refetch={refetch}
+      />
     </>
   );
-}
+};

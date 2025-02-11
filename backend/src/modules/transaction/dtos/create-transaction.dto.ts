@@ -1,4 +1,3 @@
-import { Type } from 'class-transformer';
 import {
   IsDateString,
   IsEnum,
@@ -6,34 +5,13 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  ValidateNested,
 } from 'class-validator';
-import { StockTypeEnum } from 'src/brapi/interfaces/quote-list.interface';
 import { TransactionTypeEnum } from 'src/schemas/transaction.schema';
-
-export class StockDto {
-  @IsNotEmpty()
-  @IsString()
-  stock: string; //símbolo da ação
-
-  @IsNotEmpty()
-  @IsString()
-  name: string;
-
-  @IsOptional()
-  @IsString()
-  logo: string;
-
-  @IsNotEmpty()
-  @IsEnum(StockTypeEnum)
-  type: StockTypeEnum;
-}
 
 export class CreateTransactionDto {
   @IsNotEmpty()
-  @ValidateNested()
-  @Type(() => StockDto)
-  stock: StockDto;
+  @IsString()
+  stock: string;
 
   @IsNotEmpty()
   @IsEnum(TransactionTypeEnum)

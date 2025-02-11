@@ -4,15 +4,10 @@ export interface IListTransaction {
 
 export interface ITransaction {
     stockId: string;
-
     type: TransactionTypeEnum;
-
     quantity: number;
-
     price: number;
-
     tax: number;
-
     date: Date;
 }
 
