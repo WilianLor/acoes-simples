@@ -11,4 +11,4 @@ import { AuthModule } from '../auth/auth.module';
   controllers: [TransactionController],
   exports: [],
 })
-export class TransactionModule {}
+export class TransactionModule { }
