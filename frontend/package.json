@@ -28,6 +28,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
+    "dayjs": "^1.11.13",
     "lodash": "^4.17.21",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.464.0",
