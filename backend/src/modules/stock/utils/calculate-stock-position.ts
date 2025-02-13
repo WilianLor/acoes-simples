@@ -10,13 +10,13 @@ export const calculateStockPosition = (
   stockId: Types.ObjectId,
 ): ICalculateStockPosition => {
   const filteredTransactions = transactions.filter(
-    (transaction) => transaction.stockId === stockId,
+    (transaction) => transaction.stock === stockId,
   );
 
   if (!filteredTransactions) return undefined;
 
   const { quantity, totalCost } = filteredTransactions
-    .filter((transaction) => transaction.stockId === stockId)
+    .filter((transaction) => transaction.stock === stockId)
     .reduce(
       (acc, transaction) => {
         const { type, quantity, price, tax } = transaction;
@@ -36,7 +36,7 @@ export const calculateStockPosition = (
       { totalCost: 0, quantity: 0 },
     );
 
-  const averagePrice = totalCost / quantity;
+  const averagePrice = quantity ? totalCost / quantity : 0;
   const positionValue = quantity * averagePrice;
 
   return { averagePrice: Number(averagePrice.toFixed(2)), quantity, positionValue: Number(positionValue.toFixed(2)) };

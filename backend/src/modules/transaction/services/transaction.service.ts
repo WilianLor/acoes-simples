@@ -38,7 +38,7 @@ export class TransactionService {
     }
 
     user.transactions.push({
-      stockId: stock.id,
+      stock: stock.id,
       ...createTransaction,
     } as Transaction);
 
@@ -51,12 +51,12 @@ export class TransactionService {
     { limit, skip }: ListTransactionFilter,
     userId: string,
   ): Promise<ListTransactionEntity> {
-    const user = await this.userService.getUserById(userId);
+    const user = await this.userService.getUserByIdWithStock(userId);
 
     const count = user.transactions.length;
     const endIndex = limit ? (parseInt(skip) || 0) + parseInt(limit) : count;
 
-    const transactions = user.transactions.slice(
+    const transactions = user.transactions.sort((a, b) => a.date > b.date ? -1 : 1).slice(
       skip ? parseInt(skip) : 0,
       endIndex,
     );
@@ -77,7 +77,7 @@ export class TransactionService {
 
     const { quantity } = calculateStockPosition(
       user.transactions,
-      transaction.stockId,
+      transaction.stock,
     );
 
     if (

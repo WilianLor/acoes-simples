@@ -1,10 +1,10 @@
-import { Transaction } from 'src/schemas/transaction.schema';
+import { TransactionWithStock } from 'src/schemas/transaction.schema';
 
 export class ListTransactionEntity {
   count: number;
-  transactions: Transaction[];
+  transactions: TransactionWithStock[];
 
-  constructor(transactions: Transaction[], count: number) {
+  constructor(transactions: TransactionWithStock[], count: number) {
     this.count = count;
     this.transactions = transactions;
   }

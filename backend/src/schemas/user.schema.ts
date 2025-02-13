@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Schema as MongoSchema, Document } from 'mongoose';
 import { hash, genSalt } from 'bcryptjs';
-import { Transaction } from './transaction.schema';
+import { Transaction, TransactionWithStock } from './transaction.schema';
 
 @Schema({ _id: true, timestamps: true })
 export class User extends Document {
@@ -16,6 +16,10 @@ export class User extends Document {
 
   @Prop({ type: [Transaction], default: [] })
   transactions: Transaction[];
+}
+
+export interface UserWithStock extends Omit<User, 'transactions'> {
+  transactions: TransactionWithStock[]
 }
 
 const UserSchema = SchemaFactory.createForClass(User);
