@@ -3,12 +3,20 @@ export interface IListTransaction {
 }
 
 export interface ITransaction {
-    stockId: string;
+    stock: IStock;
     type: TransactionTypeEnum;
     quantity: number;
     price: number;
     tax: number;
     date: Date;
+}
+
+export interface IStock {
+    id: string;
+    stock: string;
+    name: string;
+    logo: string;
+    type: string;
 }
 
 export enum TransactionTypeEnum {

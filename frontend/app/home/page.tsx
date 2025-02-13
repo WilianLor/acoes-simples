@@ -11,10 +11,15 @@ import { toast } from "@/hooks/use-toast";
 
 export default function DashboardPage() {
   const [stocks, setStocks] = useState<IStockList[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = async (search?: string) => {
     try {
-      const result = await axiosAuth.get<IStockList[]>("/stock");
+      setLoading(true);
+
+      const result = await axiosAuth.get<IStockList[]>("/stock", {
+        params: { stock: search },
+      });
 
       setStocks(result.data);
     } catch (error) {
@@ -25,6 +30,8 @@ export default function DashboardPage() {
           (error as any)?.response.data.message ||
           "Erro ao adicionar movimentação",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -35,8 +42,8 @@ export default function DashboardPage() {
   return (
     <main className="min-h-screen bg-black p-10">
       <DashboardHeader />
-      <SearchBar />
-      <PositionGrid stocks={stocks} />
+      <SearchBar fetch={fetchData} />
+      <PositionGrid stocks={stocks} loading={loading} />
       <AddButton refetch={fetchData} />
     </main>
   );

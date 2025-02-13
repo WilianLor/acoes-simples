@@ -4,7 +4,6 @@ import { Model, Types } from 'mongoose';
 import { BrapiService } from 'src/brapi/services/brapi.service';
 import { Stock } from 'src/schemas/stock.schema';
 import { StockSearchFilter } from '../dtos/stock-search.filter';
-import { ICreateStock } from '../interfaces/create-stock.interface';
 import { StockEntity } from '../entities/stock.entity';
 import { StockDetailFilter } from '../dtos/stock-details.filter';
 import { StockDetailsEntity } from '../entities/stock-details.entity';
@@ -30,7 +29,7 @@ export class StockService {
 
     const newStock = await this.stockModel.create({
       stock: brapiStock.results[0].symbol,
-      name: brapiStock.results[0].longName,
+      name: brapiStock.results[0]?.longName || brapiStock.results[0]?.shortName || brapiStock.results[0].symbol,
       logo: brapiStock.results[0].logourl,
       type: 'stock'
     });
@@ -78,7 +77,7 @@ export class StockService {
     const quote = await this.brapiService.quote(stockParam, filter);
 
     const transactions = user.transactions.filter(
-      (transaction) => transaction.stockId === stock.id,
+      (transaction) => transaction.stock.id === stock.id,
     );
 
     return new StockDetailsEntity(quote, transactions);
@@ -93,12 +92,12 @@ export class StockService {
     const stockIds = user.transactions.reduce<Types.ObjectId[]>(
       (acc, transaction) => {
         const stockAlreadyInReducer = acc.find(
-          (accStockId) => accStockId === transaction.stockId,
+          (accStockId) => accStockId === transaction.stock,
         );
 
         if (stockAlreadyInReducer) return acc;
 
-        return [...acc, transaction.stockId];
+        return [...acc, transaction.stock];
       },
       [],
     );
@@ -115,6 +114,6 @@ export class StockService {
       }),
     );
 
-    return stocks.filter(Boolean);
+    return stocks.filter(stock => stock?.quantity);
   }
 }

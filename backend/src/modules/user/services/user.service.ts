@@ -6,7 +6,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { compare } from 'bcryptjs';
 import { Model } from 'mongoose';
-import { User } from 'src/schemas/user.schema';
+import { User, UserWithStock } from 'src/schemas/user.schema';
 import { ICreateUser } from '../interfaces/create-user.interface';
 
 @Injectable()
@@ -33,6 +33,14 @@ export class UserService {
     if (!user) throw new NotFoundException('Usuário não encontrado.');
 
     return user;
+  }
+
+  async getUserByIdWithStock(userId: string): Promise<UserWithStock> {
+    const user = await this.userModel.findById(userId).populate({ path: 'transactions', populate: { path: 'stock' } }).sort({ 'transactions.date': 'desc' });
+
+    if (!user) throw new NotFoundException('Usuário não encontrado.');
+
+    return user as unknown as UserWithStock;
   }
 
   private async verifyUniqueName(name: string): Promise<void> {

@@ -1,5 +1,6 @@
 import { Prop, Schema } from '@nestjs/mongoose';
 import { Types, Document } from 'mongoose';
+import { Stock } from './stock.schema';
 
 export enum TransactionTypeEnum {
   sale = 'sale',
@@ -9,7 +10,7 @@ export enum TransactionTypeEnum {
 @Schema({ _id: true })
 export class Transaction extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Stock', required: true })
-  stockId: Types.ObjectId;
+  stock: Types.ObjectId;
 
   @Prop({ required: true, enum: TransactionTypeEnum })
   type: TransactionTypeEnum;
@@ -25,4 +26,8 @@ export class Transaction extends Document {
 
   @Prop({ required: true })
   date: Date;
+}
+
+export interface TransactionWithStock extends Omit<Transaction, 'stock'> {
+  stock: Stock;
 }
