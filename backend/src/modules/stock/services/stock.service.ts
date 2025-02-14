@@ -18,20 +18,26 @@ export class StockService {
     private readonly stockModel: Model<Stock>,
     private readonly brapiService: BrapiService,
     private readonly userService: UserService,
-  ) { }
+  ) {}
 
   async getOrCreate(stockName: string): Promise<Stock> {
     const stock = await this.stockModel.findOne({ stock: stockName });
 
     if (stock) return stock;
 
-    const brapiStock = await this.brapiService.quote(stockName, { interval: '1d', range: '1d' });
+    const brapiStock = await this.brapiService.quote(stockName, {
+      interval: '1d',
+      range: '1d',
+    });
 
     const newStock = await this.stockModel.create({
       stock: brapiStock.results[0].symbol,
-      name: brapiStock.results[0]?.longName || brapiStock.results[0]?.shortName || brapiStock.results[0].symbol,
+      name:
+        brapiStock.results[0]?.longName ||
+        brapiStock.results[0]?.shortName ||
+        brapiStock.results[0].symbol,
       logo: brapiStock.results[0].logourl,
-      type: 'stock'
+      type: 'stock',
     });
 
     return newStock;
@@ -77,10 +83,10 @@ export class StockService {
     const quote = await this.brapiService.quote(stockParam, filter);
 
     const transactions = user.transactions.filter(
-      (transaction) => transaction.stock.id === stock.id,
+      (transaction) => transaction.stock === stock.id,
     );
 
-    return new StockDetailsEntity(quote, transactions);
+    return new StockDetailsEntity(quote, transactions, stock);
   }
 
   async list(
@@ -114,6 +120,6 @@ export class StockService {
       }),
     );
 
-    return stocks.filter(stock => stock?.quantity);
+    return stocks.filter((stock) => stock?.quantity);
   }
 }

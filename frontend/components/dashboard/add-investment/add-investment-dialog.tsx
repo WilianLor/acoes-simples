@@ -36,11 +36,11 @@ export function AddInvestmentDialog({
   onOpenChange,
   refetch,
 }: AddInvestmentDialogProps) {
-  const { register, handleSubmit, control, setValue } = useForm();
+  const { register, handleSubmit, control, setValue, reset } = useForm();
   const { toast } = useToast();
   const [date, setDate] = useState<Date>(new Date());
-  const [stocks, setStocks] = useState<any[]>([]); // Armazenando os dados de estoque
-  const [isLoading, setIsLoading] = useState(false); // Controlando o estado de carregamento
+  const [stocks, setStocks] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchStocks = useCallback(
     debounce(async (search: string) => {
@@ -86,6 +86,15 @@ export function AddInvestmentDialog({
         description:
           (error as any)?.response.data.message ||
           "Erro ao adicionar movimentação",
+      });
+    } finally {
+      reset({
+        stock: "",
+        type: "",
+        quantity: "",
+        price: "",
+        tax: "",
+        date: "",
       });
     }
   }
@@ -216,6 +225,7 @@ export function AddInvestmentDialog({
               id="quantity"
               type="number"
               required
+              min={1}
               {...register("quantity")}
               className="bg-zinc-800 border-zinc-700 text-white"
               placeholder="Quantidade"
@@ -229,6 +239,7 @@ export function AddInvestmentDialog({
               id="price"
               type="number"
               step="0.01"
+              min={1}
               required
               {...register("price")}
               className="bg-zinc-800 border-zinc-700 text-white"
@@ -243,6 +254,7 @@ export function AddInvestmentDialog({
               id="tax"
               type="number"
               step="0.01"
+              min={0}
               required
               {...register("tax")}
               className="bg-zinc-800 border-zinc-700 text-white"

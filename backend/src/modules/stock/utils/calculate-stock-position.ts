@@ -37,7 +37,6 @@ export const calculateStockPosition = (
     );
 
   const averagePrice = quantity ? totalCost / quantity : 0;
-  const positionValue = quantity * averagePrice;
 
-  return { averagePrice: Number(averagePrice.toFixed(2)), quantity, positionValue: Number(positionValue.toFixed(2)) };
+  return { averagePrice: Number(averagePrice.toFixed(2)), quantity };
 };

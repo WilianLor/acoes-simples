@@ -3,12 +3,11 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
-	const router = useRouter();
+  const router = useRouter();
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-	useEffect(() => {
-		router.push("/login");
-	}, []); // Executa apenas uma vez após a renderização inicial
+  useEffect(() => {
+    router.push("/login");
+  }, []);
 
-	return <div />;
+  return <div />;
 }

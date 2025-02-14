@@ -19,7 +19,7 @@ export class TransactionService {
   constructor(
     private readonly userService: UserService,
     private readonly stockService: StockService,
-  ) { }
+  ) {}
 
   async create(
     { stock: stockName, ...createTransaction }: CreateTransactionDto,
@@ -29,6 +29,9 @@ export class TransactionService {
     const stock = await this.stockService.getOrCreate(stockName);
 
     const { quantity } = calculateStockPosition(user.transactions, stock.id);
+
+    if (createTransaction.quantity < 1)
+      throw new BadRequestException('Insira uma quantidade válida');
 
     if (
       createTransaction.type === TransactionTypeEnum.sale &&
@@ -56,10 +59,9 @@ export class TransactionService {
     const count = user.transactions.length;
     const endIndex = limit ? (parseInt(skip) || 0) + parseInt(limit) : count;
 
-    const transactions = user.transactions.sort((a, b) => a.date > b.date ? -1 : 1).slice(
-      skip ? parseInt(skip) : 0,
-      endIndex,
-    );
+    const transactions = user.transactions
+      .sort((a, b) => (a.date > b.date ? -1 : 1))
+      .slice(skip ? parseInt(skip) : 0, endIndex);
 
     return new ListTransactionEntity(transactions, count);
   }

@@ -22,13 +22,14 @@ import { StockListEntity } from 'src/modules/stock/entities/stock-list.entity';
 import * as XLSX from 'xlsx';
 import { Response } from 'express';
 import { dateHourFormater } from 'src/common/utils/date-formater';
+
 @Controller('/transaction')
 @UseGuards(AuthGuard)
 export class TransactionController {
   constructor(
     private readonly transactionService: TransactionService,
-    private readonly stockService: StockService
-  ) { }
+    private readonly stockService: StockService,
+  ) {}
 
   @Post()
   async create(
@@ -54,29 +55,40 @@ export class TransactionController {
     return this.transactionService.list(filter, userId);
   }
 
-  @Get("xlsx")
+  @Get('xlsx')
   async exportXlsx(
     @Query() filter: ListTransactionFilter,
     @Request() { userId }: IRequest,
     @Res() res: Response,
-    // ): Promise<Buffer> {
   ): Promise<void> {
-    const dataStocks: StockListEntity[] = await this.stockService.list({}, userId);
-    const dataTransactions: ListTransactionEntity = await this.transactionService.list(filter, userId);
+    const dataStocks: StockListEntity[] = await this.stockService.list(
+      {},
+      userId,
+    );
 
-    const stockHeaders = ["Stock", "Preço Médio", "Valor da Posição", "Quantidade"];
-    const stockData = dataStocks.map(stock => [
+    const dataTransactions: ListTransactionEntity =
+      await this.transactionService.list(filter, userId);
+
+    const stockHeaders = ['Ativo', 'Preço Médio', 'Quantidade'];
+
+    const stockData = dataStocks.map((stock) => [
       stock.stock,
       stock.averagePrice,
-      stock.positionValue,
       stock.quantity,
     ]);
 
-    // "Stock ID",
-    const transactionHeaders = ["Tipo", "Quantidade", "Preço", "Taxa", "Data"];
-    const transactionData = dataTransactions.transactions.map(transaction => [
-      // transaction.stockId.toString(),
-      transaction.type,
+    const transactionHeaders = [
+      'Nome',
+      'Tipo',
+      'Quantidade',
+      'Preço',
+      'Taxa',
+      'Data',
+    ];
+
+    const transactionData = dataTransactions.transactions.map((transaction) => [
+      transaction.stock.name,
+      transaction.type === 'sale' ? 'Venda' : 'Compra',
       transaction.quantity,
       transaction.price,
       transaction.tax,
@@ -85,25 +97,25 @@ export class TransactionController {
 
     const stockSheet = XLSX.utils.aoa_to_sheet([stockHeaders, ...stockData]);
 
-    //Width da coluna
-    stockSheet['!cols'] = [
-      { wch: 20 },
-      { wch: 20 },
-      { wch: 20 },
-      { wch: 20 },
-    ];
-    const transactionSheet = XLSX.utils.aoa_to_sheet([transactionHeaders, ...transactionData]);
+    stockSheet['!cols'] = [{ wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 20 }];
+
+    const transactionSheet = XLSX.utils.aoa_to_sheet([
+      transactionHeaders,
+      ...transactionData,
+    ]);
 
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, stockSheet, "Stock Data");
-    XLSX.utils.book_append_sheet(wb, transactionSheet, "Transaction Data");
 
-    const xlsxBuffer = XLSX.write(wb, { bookType: "xlsx", type: "buffer" });
+    XLSX.utils.book_append_sheet(wb, stockSheet, 'Stock Data');
+    XLSX.utils.book_append_sheet(wb, transactionSheet, 'Transaction Data');
 
-    // return xlsxBuffer;
+    const xlsxBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' });
 
     res.setHeader('Content-Disposition', 'attachment; filename="data.xlsx"');
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
     res.send(xlsxBuffer);
   }
 }

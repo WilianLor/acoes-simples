@@ -3,7 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { TimeFrameType } from "@/types/time-frame-selection.interface";
 
-const TimeframeSelector = ({ selected, onSelect }: { selected: TimeFrameType, onSelect: (opt: TimeFrameType) => void }) => {
+const TimeframeSelector = ({
+  selected,
+  onSelect,
+}: {
+  selected: TimeFrameType;
+  onSelect: (opt: TimeFrameType) => void;
+}) => {
   return (
     <div className="flex items-center gap-2">
       <Button
@@ -20,7 +26,7 @@ const TimeframeSelector = ({ selected, onSelect }: { selected: TimeFrameType, on
         onClick={() => selected !== "1mo" && onSelect("1mo")}
         className="bg-zinc-800 hover:bg-zinc-700 text-white aria-selected:bg-yellow-500 aria-selected:hover:bg-yellow-600 aria-selected:text-black"
       >
-        1 mÃªs
+        1 mês
       </Button>
       <Button
         variant="outline"
@@ -40,6 +46,6 @@ const TimeframeSelector = ({ selected, onSelect }: { selected: TimeFrameType, on
       </Button>
     </div>
   );
-}
+};
 
 export default TimeframeSelector;

@@ -1,13 +1,26 @@
 "use client";
 
 import { IHistoricalDataPrice } from "@/types/stock-analytics.interface";
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import dayjs from "dayjs";
 
-const PriceChart = ({ data, coin }: { data: IHistoricalDataPrice[], coin?: string }) => {
+const PriceChart = ({
+  data,
+  coin,
+}: {
+  data: IHistoricalDataPrice[];
+  coin?: string;
+}) => {
   return (
     <div className="h-[700px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="90%">
         <LineChart data={data}>
           <XAxis
             dataKey="date"
@@ -24,7 +37,7 @@ const PriceChart = ({ data, coin }: { data: IHistoricalDataPrice[], coin?: strin
             tickFormatter={(value) => value.toFixed(2)}
           />
           <Tooltip
-            content={({ payload, label }) => {
+            content={({ payload }) => {
               if (!payload || payload.length === 0) return null;
               const {
                 date,
@@ -43,7 +56,9 @@ const PriceChart = ({ data, coin }: { data: IHistoricalDataPrice[], coin?: strin
                   }}
                 >
                   <p className=" mb-2 text-yellow-500">
-                    <strong className="">Data: {dayjs(new Date(date * 1000)).format("DD/MM/YYYY")}</strong>
+                    <strong className="">
+                      Data: {dayjs(new Date(date * 1000)).format("DD/MM/YYYY")}
+                    </strong>
                   </p>
                   <p>
                     <strong>Abertura:</strong> {coin} {open.toFixed(2)}
@@ -75,6 +90,6 @@ const PriceChart = ({ data, coin }: { data: IHistoricalDataPrice[], coin?: strin
       </ResponsiveContainer>
     </div>
   );
-}
+};
 
 export default PriceChart;

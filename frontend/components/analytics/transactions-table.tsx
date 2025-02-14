@@ -11,19 +11,10 @@ import {
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { ITransaction, TransactionTypeEnum } from "@/types/list-transaction.interface";
-
-const transactions = [
-  { quantity: 4, price: 10.00, total: 40.00, type: "V" },
-  { quantity: 4, price: 10.00, total: 40.00, type: "C" },
-  { quantity: 4, price: 10.00, total: 40.00, type: "V" },
-  { quantity: 4, price: 10.00, total: 40.00, type: "C" },
-  { quantity: 4, price: 10.00, total: 40.00, type: "V" },
-  { quantity: 4, price: 10.00, total: 40.00, type: "C" },
-  { quantity: 4, price: 10.00, total: 40.00, type: "V" },
-  { quantity: 4, price: 10.00, total: 40.00, type: "C" },
-  { quantity: 4, price: 10.00, total: 40.00, type: "V" },
-];
+import {
+  ITransaction,
+  TransactionTypeEnum,
+} from "@/types/list-transaction.interface";
 
 const TransactionsTable = ({ data }: { data: ITransaction[] }) => {
   return (
@@ -43,17 +34,29 @@ const TransactionsTable = ({ data }: { data: ITransaction[] }) => {
             {data.map((transaction, index) => (
               <TableRow
                 key={index}
-                className={`border-zinc-800 ${transaction.type === TransactionTypeEnum.buy
-                  ? "bg-green-950/20"
-                  : "bg-red-950/20"
-                  }`}
+                className={`border-zinc-800 ${
+                  transaction.type === TransactionTypeEnum.buy
+                    ? "bg-green-950/20"
+                    : "bg-red-950/20"
+                }`}
               >
-                <TableCell className="text-white">{transaction.quantity}</TableCell>
-                <TableCell className="text-white">R$ {transaction.price.toFixed(2)}</TableCell>
-                <TableCell className="text-white">R$ {(transaction.quantity * transaction.price).toFixed(2)}</TableCell>
+                <TableCell className="text-white">
+                  {transaction.quantity}
+                </TableCell>
+                <TableCell className="text-white">
+                  R$ {transaction.price.toFixed(2)}
+                </TableCell>
+                <TableCell className="text-white">
+                  R$ {(transaction.quantity * transaction.price).toFixed(2)}
+                </TableCell>
                 <TableCell>
-                  <span className={`${transaction.type === TransactionTypeEnum.buy ? "text-green-500" : "text-red-500"
-                    }`}>
+                  <span
+                    className={`${
+                      transaction.type === TransactionTypeEnum.buy
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }`}
+                  >
                     {transaction.type === TransactionTypeEnum.buy ? "C" : "V"}
                   </span>
                 </TableCell>
@@ -62,20 +65,8 @@ const TransactionsTable = ({ data }: { data: ITransaction[] }) => {
           </TableBody>
         </Table>
       </div>
-      <div className="mt-4">
-        <Button
-          variant="link"
-          className="text-yellow-500 hover:text-yellow-600"
-          asChild
-        >
-          <Link href="/log" className="flex items-center gap-2">
-            Ver Detalhado
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </Button>
-      </div>
     </div>
   );
-}
+};
 
 export default TransactionsTable;

@@ -21,10 +21,10 @@ import { redisStore } from 'cache-manager-redis-store';
       store: redisStore,
       host: 'localhost',
       port: 6379,
-      ttl: 600000000000, // Tempo de vida do cache em segundos
+      ttl: 600000000000,
     }),
   ],
   providers: [BrapiService],
   exports: [BrapiService],
 })
-export class BrapiModule { }
+export class BrapiModule {}
