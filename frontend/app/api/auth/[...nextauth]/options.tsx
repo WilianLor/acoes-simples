@@ -5,7 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 async function refreshToken(token: JWT): Promise<JWT> {
   try {
-    const res = await axios.post("/auth/refresh-token", {
+    const res = await axios.post("http://acoes-simples-backend-1:3031/auth/refresh-token", {
       refreshToken: token.backendToken.refreshToken,
     });
 
