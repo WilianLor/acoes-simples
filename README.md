@@ -46,8 +46,11 @@ Siga os passos abaixo para configurar e executar o projeto localmente:
    Após a conclusão do processo de build, o aplicativo estará disponível em [http://localhost:3000](http://localhost:3000).
 
 ## Credenciais de Acesso
+O aplicativo funciona em tempo real e não armazena dados históricos preexistentes. Para utilizá-lo, basta cadastrar um usuário e adicionar um investimento.
 
-Para acessar o aplicativo, utilize as seguintes credenciais:
+Recomendamos utilizar o ativo AAPL34, pois a API da Brapi fornece um histórico de dados extenso e confiável.
+
+Para acessar o aplicativo, sugerimos as seguintes credenciais para cadastrar, pois tem validação de senha forte:
 
 - **E-mail:** admin@admin.com
 - **Senha:** @@11Admin
