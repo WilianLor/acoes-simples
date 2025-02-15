@@ -36,7 +36,7 @@ const authOptions: NextAuthOptions = {
         }
 
         try {
-          const res = await axios.post("/auth/login", {
+          const res = await axios.post("http://acoes-simples-backend-1:3031/auth/login", {
             mail: credentials.mail,
             password: credentials.password,
           });

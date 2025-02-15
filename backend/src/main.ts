@@ -18,7 +18,7 @@ async function bootstrap() {
     ) || true;
 
   app.enableCors({
-    origin: corsOrigin,
+    origin: "*",
     methods: configService.get('cors.corsMethods'),
     credentials: true,
   });
@@ -32,7 +32,7 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(configService.get('application.port'));
+  await app.listen(configService.get('application.port'), "0.0.0.0");
 }
 
 bootstrap();

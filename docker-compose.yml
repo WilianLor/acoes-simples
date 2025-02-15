@@ -23,7 +23,7 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
-    command: sh -c "yarn install && yarn dev"
+    command: sh -c "yarn install && yarn build && yarn start"
     ports:
       - 3031:3031
     environment:
@@ -39,7 +39,7 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    command: sh -c "yarn install && yarn dev"
+    command: sh -c "yarn install && yarn build && yarn start"
     ports:
       - 3000:3000
     depends_on:
